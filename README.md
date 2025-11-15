@@ -1,6 +1,6 @@
 
 
-# Acredia
+# Acredia - A blockchain-based Academic Credential System
 
 <p align="center"><img src="frontend/public/logo.png" alt="Acredia Logo" width="120" /></p>
 
