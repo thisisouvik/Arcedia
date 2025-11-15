@@ -3,6 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import {
   Shield,
   CheckCircle,
@@ -24,6 +27,47 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
+  const [showSolutions, setShowSolutions] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const router = useRouter();
+  let closeTimeout: NodeJS.Timeout;
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsAuthenticated(!!session);
+    if (session?.user) {
+      setUserRole(session.user.user_metadata?.role || null);
+    }
+  };
+
+  const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'student' | 'institution') => {
+    e.preventDefault();
+    
+    if (!isAuthenticated) {
+      // Redirect to sign-in page
+      router.push('/auth/login');
+    } else {
+      // Redirect to dashboard regardless of role
+      router.push('/dashboard');
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (closeTimeout) clearTimeout(closeTimeout);
+    setShowSolutions(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimeout = setTimeout(() => {
+      setShowSolutions(false);
+    }, 500); // Increased to 500ms delay before closing
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50 to-cyan-50">
       {/* Navigation */}
@@ -43,6 +87,109 @@ export default function Home() {
               </span>
             </Link>
             <div className="flex items-center space-x-4">
+              {/* Solutions Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Button 
+                  variant="ghost" 
+                  className="text-gray-700 hover:text-teal-600 flex items-center gap-1"
+                >
+                  Solutions
+                  <svg 
+                    className={`w-4 h-4 transition-transform duration-200 ${showSolutions ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Button>
+
+                {/* Dropdown Menu */}
+                {showSolutions && (
+                  <div 
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[95vw] sm:w-[500px] max-w-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 sm:p-6 animate-in fade-in slide-in-from-top-5 duration-200"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      {/* For Universities */}
+                      <button 
+                        onClick={(e) => handleDashboardClick(e, 'institution')}
+                        className="group text-left w-full"
+                      >
+                        <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-4 sm:p-6 rounded-xl hover:bg-teal-50 transition-all duration-300 border-2 border-transparent hover:border-teal-300 hover:shadow-lg">
+                          <div className="bg-gradient-to-br from-teal-500 to-cyan-500 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                          </div>
+                          <div className="text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-teal-600 transition-colors text-base sm:text-lg">
+                              Institution Dashboard
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
+                              Issue and manage credentials for your students
+                            </p>
+                            <div className="inline-flex items-center gap-2 text-xs text-teal-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-teal-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                              {isAuthenticated ? 'Go to Dashboard' : 'Sign In to Access'}
+                              <ArrowRight className="w-3 h-3" />
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* For Students */}
+                      <button 
+                        onClick={(e) => handleDashboardClick(e, 'student')}
+                        className="group text-left w-full"
+                      >
+                        <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-4 sm:p-6 rounded-xl hover:bg-cyan-50 transition-all duration-300 border-2 border-transparent hover:border-cyan-300 hover:shadow-lg">
+                          <div className="bg-gradient-to-br from-cyan-500 to-blue-500 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                          </div>
+                          <div className="text-center">
+                            <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-cyan-600 transition-colors text-base sm:text-lg">
+                              Student Dashboard
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
+                              View and share your academic credentials
+                            </p>
+                            <div className="inline-flex items-center gap-2 text-xs text-cyan-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-cyan-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                              {isAuthenticated ? 'Go to Dashboard' : 'Sign In to Access'}
+                              <ArrowRight className="w-3 h-3" />
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                        <div className="text-center sm:text-left">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {isAuthenticated ? 'Welcome back!' : 'New to Acredia?'}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            {isAuthenticated ? 'Access your dashboard' : 'Join 500+ universities worldwide'}
+                          </p>
+                        </div>
+                        {!isAuthenticated && (
+                          <Link href="/auth/register">
+                            <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all text-sm sm:text-base w-full sm:w-auto">
+                              Get Started
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Link href="/about">
                 <Button variant="ghost" className="text-gray-700 hover:text-teal-600">
                   About
@@ -259,13 +406,67 @@ export default function Home() {
               Trusted by Leading Universities Worldwide
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-12 opacity-60">
-            <div className="text-2xl font-bold text-gray-400">MIT</div>
-            <div className="text-2xl font-bold text-gray-400">Stanford</div>
-            <div className="text-2xl font-bold text-gray-400">Harvard</div>
-            <div className="text-2xl font-bold text-gray-400">Oxford</div>
-            <div className="text-2xl font-bold text-gray-400">Cambridge</div>
-            <div className="text-2xl font-bold text-gray-400">IIT</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-6xl mx-auto">
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://tse3.mm.bing.net/th/id/OIP.7bACtsXUKPDhBOuidawTTwHaGr?pid=Api&P=0&h=180"
+                alt="MIT"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://www.scholarshipregion.com/wp-content/uploads/2022/09/University-of-Oxford-UK.jpg"
+                alt="Oxford University"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://tse1.mm.bing.net/th/id/OIP.xHMtPAL900IBFxWZBfM6gAHaEp?pid=Api&P=0&h=180"
+                alt="Stanford University"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://tse4.mm.bing.net/th/id/OIP.7YBhBgFBg-bpAgV5kpJ0AwHaEL?pid=Api&P=0&h=180"
+                alt="Harvard University"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://tse3.mm.bing.net/th/id/OIP.cJonBR8WAhleDoeIvPHtDQHaEK?pid=Api&P=0&h=180"
+                alt="Cambridge University"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
+            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
+              <Image
+                src="https://tse3.mm.bing.net/th/id/OIP.6_BcDwnHtQHpmB0zsZW6JwHaDe?pid=Api&P=0&h=180"
+                alt="IIT"
+                width={160}
+                height={140}
+                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
+                unoptimized
+              />
+            </div>
           </div>
         </div>
       </section>
