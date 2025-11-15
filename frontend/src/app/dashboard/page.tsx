@@ -43,20 +43,42 @@ function DashboardContent() {
             try {
                 const { data, error } = await supabase
                     .from('institutions')
-                    .select('id')
+                    .select('id, wallet_address')
                     .eq('auth_user_id', user.id)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
                     console.error('Error fetching institution:', error);
                     toast.error('Failed to load institution data');
                 } else if (data) {
                     setInstitutionId(data.id);
+                    console.log('✅ Institution loaded:', data.id);
                 } else {
-                    toast.error('Institution record not found. Please contact support.');
+                    console.warn('No institution record found for user');
+                    toast.warning('Institution record not found. Creating profile...');
+
+                    // Try to create institution record
+                    const { data: newInst, error: createError } = await supabase
+                        .from('institutions')
+                        .insert([{
+                            auth_user_id: user.id,
+                            email: user.email,
+                            name: user.email?.split('@')[0] || 'Institution',
+                        }])
+                        .select('id')
+                        .single();
+
+                    if (createError) {
+                        console.error('Error creating institution:', createError);
+                        toast.error('Failed to create institution profile');
+                    } else if (newInst) {
+                        setInstitutionId(newInst.id);
+                        toast.success('Institution profile created');
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
+                toast.error('An unexpected error occurred');
             } finally {
                 setLoading(false);
             }
