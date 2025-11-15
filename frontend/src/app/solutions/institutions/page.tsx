@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useState } from 'react';
 import {
     Building2,
     Shield,
@@ -15,10 +16,25 @@ import {
     Zap,
     CloudUpload,
     BarChart3,
-    Globe
+    Globe,
+    GraduationCap
 } from 'lucide-react';
 
 export default function InstitutionSolutionsPage() {
+    const [showSolutions, setShowSolutions] = useState(false);
+    let closeTimeout: NodeJS.Timeout;
+
+    const handleMouseEnter = () => {
+        if (closeTimeout) clearTimeout(closeTimeout);
+        setShowSolutions(true);
+    };
+
+    const handleMouseLeave = () => {
+        closeTimeout = setTimeout(() => {
+            setShowSolutions(false);
+        }, 500);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50 to-cyan-50">
             {/* Navigation */}
@@ -38,6 +54,100 @@ export default function InstitutionSolutionsPage() {
                             </span>
                         </Link>
                         <div className="flex items-center space-x-4">
+                            {/* Solutions Dropdown */}
+                            <div 
+                                className="relative"
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <Button 
+                                    variant="ghost" 
+                                    className="text-gray-700 hover:text-teal-600 flex items-center gap-1"
+                                >
+                                    Solutions
+                                    <svg 
+                                        className={`w-4 h-4 transition-transform duration-200 ${showSolutions ? 'rotate-180' : ''}`}
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </Button>
+
+                                {/* Dropdown Menu */}
+                                {showSolutions && (
+                                    <div 
+                                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[95vw] sm:w-[500px] max-w-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 sm:p-6 animate-in fade-in slide-in-from-top-5 duration-200"
+                                        onMouseEnter={handleMouseEnter}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                            {/* For Institutions */}
+                                            <Link href="/solutions/institutions" className="group text-left w-full">
+                                                <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-4 sm:p-6 rounded-xl hover:bg-teal-50 transition-all duration-300 border-2 border-teal-300 bg-teal-50 shadow-lg">
+                                                    <div className="bg-gradient-to-br from-teal-500 to-cyan-500 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                                        <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-teal-600 transition-colors text-base sm:text-lg">
+                                                            For Institutions
+                                                        </h3>
+                                                        <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
+                                                            Issue and manage credentials for your students
+                                                        </p>
+                                                        <div className="inline-flex items-center gap-2 text-xs text-teal-600 font-semibold bg-teal-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                                                            Current Page
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+
+                                            {/* For Students */}
+                                            <Link href="/solutions/students" className="group text-left w-full">
+                                                <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-4 sm:p-6 rounded-xl hover:bg-cyan-50 transition-all duration-300 border-2 border-transparent hover:border-cyan-300 hover:shadow-lg">
+                                                    <div className="bg-gradient-to-br from-cyan-500 to-blue-500 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                                        <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-cyan-600 transition-colors text-base sm:text-lg">
+                                                            For Students
+                                                        </h3>
+                                                        <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
+                                                            View and share your academic credentials
+                                                        </p>
+                                                        <div className="inline-flex items-center gap-2 text-xs text-cyan-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-cyan-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                                                            Learn More
+                                                            <ArrowRight className="w-3 h-3" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+
+                                        {/* Bottom CTA */}
+                                        <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                                                <div className="text-center sm:text-left">
+                                                    <p className="text-sm font-semibold text-gray-900">
+                                                        New to Acredia?
+                                                    </p>
+                                                    <p className="text-xs text-gray-600">
+                                                        Join 500+ universities worldwide
+                                                    </p>
+                                                </div>
+                                                <Link href="/auth/register">
+                                                    <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all text-sm sm:text-base w-full sm:w-auto">
+                                                        Get Started
+                                                        <ArrowRight className="w-4 h-4 ml-2" />
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <Link href="/about">
                                 <Button variant="ghost" className="text-gray-700 hover:text-teal-600">
                                     About
