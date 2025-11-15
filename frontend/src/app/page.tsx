@@ -598,34 +598,59 @@ export default function Home() {
       </section>
 
       {/* W3C Compliance */}
-      <section className="bg-gradient-to-br from-teal-600 to-cyan-600 py-24 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <FileCheck className="w-16 h-16 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Fully Compliant & Standards-Based
-            </h2>
-            <p className="text-xl text-teal-100 mb-12">
-              Acredia adheres to international standards ensuring global acceptance
-              and regulatory compliance
-            </p>
+      <section className="relative py-24 overflow-hidden">
+        {/* Transparent Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0C8B8C]/20 via-[#0E9C9D]/20 to-[#00B8C0]/20 backdrop-blur-sm"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="max-w-2xl">
+              <FileCheck className="w-16 h-16 mx-auto lg:mx-0 mb-6 text-gray-900" />
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 text-center lg:text-left">
+                Fully Compliant & Standards-Based
+              </h2>
+              <p className="text-xl text-gray-700 mb-12 text-center lg:text-left">
+                Acredia adheres to international standards ensuring global acceptance
+                and regulatory compliance
+              </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <div className="text-3xl font-bold mb-2">W3C</div>
-                <div className="text-sm text-teal-100">Verifiable Credentials</div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white/60 backdrop-blur-md rounded-xl p-6 border border-gray-300/50 hover:bg-white/80 hover:shadow-xl transition-all">
+                  <div className="text-3xl font-bold mb-2 text-gray-900">W3C</div>
+                  <div className="text-sm text-gray-700 font-medium">Verifiable Credentials</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-md rounded-xl p-6 border border-gray-300/50 hover:bg-white/80 hover:shadow-xl transition-all">
+                  <div className="text-3xl font-bold mb-2 text-gray-900">NAD</div>
+                  <div className="text-sm text-gray-700 font-medium">Academic Bank</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-md rounded-xl p-6 border border-gray-300/50 hover:bg-white/80 hover:shadow-xl transition-all">
+                  <div className="text-3xl font-bold mb-2 text-gray-900">ABC</div>
+                  <div className="text-sm text-gray-700 font-medium">Credit Framework</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-md rounded-xl p-6 border border-gray-300/50 hover:bg-white/80 hover:shadow-xl transition-all">
+                  <div className="text-3xl font-bold mb-2 text-gray-900">NEP 2020</div>
+                  <div className="text-sm text-gray-700 font-medium">Education Policy</div>
+                </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <div className="text-3xl font-bold mb-2">NAD</div>
-                <div className="text-sm text-teal-100">Academic Bank</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <div className="text-3xl font-bold mb-2">ABC</div>
-                <div className="text-sm text-teal-100">Credit Framework</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <div className="text-3xl font-bold mb-2">NEP 2020</div>
-                <div className="text-sm text-teal-100">Education Policy</div>
+            </div>
+
+            {/* Right Video */}
+            <div className="relative">
+              <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/40 hover:border-white/60 transition-all">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto"
+                >
+                  <source
+                    src="https://res.cloudinary.com/dmys4qhqv/video/upload/v1763193319/Image_Recreation_To_Video_Generation_tovxfr.mp4"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </div>
