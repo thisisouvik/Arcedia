@@ -86,8 +86,8 @@ export default function InstitutionSolutionsPage() {
                                 </Button>
                             </Link>
                             <Link href="/auth/login">
-                                <Button size="lg" variant="outline" className="border-2 border-gray-300 hover:bg-gray-100 px-10 py-6 text-lg">
-                                    Sign In to Dashboard
+                                <Button size="lg" className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-teal-600 px-10 py-6 text-lg font-bold">
+                                    Sign In
                                 </Button>
                             </Link>
                         </div>
@@ -296,7 +296,7 @@ export default function InstitutionSolutionsPage() {
                             </Button>
                         </Link>
                         <Link href="/auth/login">
-                            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg font-bold">
+                            <Button size="lg" className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-teal-600 px-10 py-6 text-lg font-bold">
                                 Sign In
                             </Button>
                         </Link>
