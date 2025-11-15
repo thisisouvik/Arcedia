@@ -60,12 +60,11 @@ export default function AboutPage() {
     const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'student' | 'institution') => {
         e.preventDefault();
         
-        if (!isAuthenticated) {
-            // Redirect to sign-in page
-            router.push('/auth/login');
+        // Navigate to solution pages instead of dashboard
+        if (dashboardType === 'student') {
+            router.push('/solutions/students');
         } else {
-            // Redirect to dashboard regardless of role
-            router.push('/dashboard');
+            router.push('/solutions/institutions');
         }
     };
 
@@ -128,13 +127,13 @@ export default function AboutPage() {
                                                     </div>
                                                     <div className="text-center">
                                                         <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-teal-600 transition-colors text-base sm:text-lg">
-                                                            Institution Dashboard
+                                                            For Institutions
                                                         </h3>
                                                         <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
                                                             Issue and manage credentials for your students
                                                         </p>
                                                         <div className="inline-flex items-center gap-2 text-xs text-teal-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-teal-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
-                                                            {isAuthenticated ? 'Go to Dashboard' : 'Sign In to Access'}
+                                                            Learn More
                                                             <ArrowRight className="w-3 h-3" />
                                                         </div>
                                                     </div>
@@ -152,13 +151,13 @@ export default function AboutPage() {
                                                     </div>
                                                     <div className="text-center">
                                                         <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-cyan-600 transition-colors text-base sm:text-lg">
-                                                            Student Dashboard
+                                                            For Students
                                                         </h3>
                                                         <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2">
                                                             View and share your academic credentials
                                                         </p>
                                                         <div className="inline-flex items-center gap-2 text-xs text-cyan-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-cyan-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
-                                                            {isAuthenticated ? 'Go to Dashboard' : 'Sign In to Access'}
+                                                            Learn More
                                                             <ArrowRight className="w-3 h-3" />
                                                         </div>
                                                     </div>
@@ -171,20 +170,18 @@ export default function AboutPage() {
                                             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                                                 <div className="text-center sm:text-left">
                                                     <p className="text-sm font-semibold text-gray-900">
-                                                        {isAuthenticated ? 'Welcome back!' : 'New to Acredia?'}
+                                                        New to Acredia?
                                                     </p>
                                                     <p className="text-xs text-gray-600">
-                                                        {isAuthenticated ? 'Access your dashboard' : 'Join 500+ universities worldwide'}
+                                                        Join 500+ universities worldwide
                                                     </p>
                                                 </div>
-                                                {!isAuthenticated && (
-                                                    <Link href="/auth/register">
-                                                        <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all text-sm sm:text-base w-full sm:w-auto">
-                                                            Get Started
-                                                            <ArrowRight className="w-4 h-4 ml-2" />
-                                                        </Button>
-                                                    </Link>
-                                                )}
+                                                <Link href="/auth/register">
+                                                    <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all text-sm sm:text-base w-full sm:w-auto">
+                                                        Get Started
+                                                        <ArrowRight className="w-4 h-4 ml-2" />
+                                                    </Button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
