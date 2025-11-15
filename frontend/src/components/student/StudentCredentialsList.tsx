@@ -247,6 +247,11 @@ function CredentialCard({ credential }: { credential: Credential }) {
     };
 
     const handleGenerateQR = () => {
+        console.log('🔍 Opening QR modal for credential:', {
+            id: credential.id,
+            token_id: credential.token_id,
+            full_credential: credential
+        });
         setShowQRModal(true);
     };
 
@@ -255,8 +260,7 @@ function CredentialCard({ credential }: { credential: Credential }) {
             <QRCodeModal
                 open={showQRModal}
                 onClose={() => setShowQRModal(false)}
-                tokenId={credential.token_id}
-                credentialType={metadata.credentialType}
+                credential={credential}
             />
             <div className="border border-gray-200 rounded-lg p-4 hover:border-teal-500 transition-colors">
                 <div className="flex items-start justify-between">
