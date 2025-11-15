@@ -2,6 +2,14 @@ import { supabase } from './supabase';
 import { uploadToIPFS, uploadJSONToIPFS, getIPFSUrl } from './ipfs';
 import { issueCredentialNFT, registerCredential, generateCredentialHash, revokeCredential, getCredentialIssuer } from './contracts';
 
+export interface Subject {
+    id: string;
+    name: string;
+    marks: string;
+    maxMarks: string;
+    grade?: string;
+}
+
 export interface CredentialData {
     // Student info
     studentName: string;
@@ -14,6 +22,7 @@ export interface CredentialData {
     major?: string;
     gpa?: string;
     issueDate: string;
+    subjects?: Subject[];
 
     // Institution info
     institutionId: string;
@@ -41,6 +50,7 @@ export interface CredentialMetadata {
         issueDate: string;
         institutionName: string;
         credentialType: string;
+        subjects?: Subject[];
     };
 }
 
@@ -107,6 +117,14 @@ export async function issueCredential(
                         },
                     ]
                     : []),
+                ...(data.subjects && data.subjects.length > 0
+                    ? [
+                        {
+                            trait_type: 'Total Subjects',
+                            value: data.subjects.length.toString(),
+                        },
+                    ]
+                    : []),
             ],
             credentialData: {
                 studentName: data.studentName,
@@ -117,6 +135,7 @@ export async function issueCredential(
                 issueDate: data.issueDate,
                 institutionName: data.institutionName,
                 credentialType: data.credentialType,
+                subjects: data.subjects,
             },
         };
 
