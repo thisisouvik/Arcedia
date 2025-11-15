@@ -86,8 +86,8 @@ export default function StudentSolutionsPage() {
                                 </Button>
                             </Link>
                             <Link href="/auth/login">
-                                <Button size="lg" className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-cyan-600 px-10 py-6 text-lg font-bold">
-                                    Sign In
+                                <Button size="lg" className="bg-blue-600 border-2 border-blue-700 text-white hover:bg-blue-700 px-10 py-6 text-lg font-bold">
+                                    Sign In to Dashboard
                                 </Button>
                             </Link>
                         </div>

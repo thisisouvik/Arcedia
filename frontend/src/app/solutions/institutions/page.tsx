@@ -80,14 +80,14 @@ export default function InstitutionSolutionsPage() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
                             <Link href="/auth/register?role=institution">
-                                <Button size="lg" className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-10 py-6 text-lg">
+                                <Button size="lg" className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-10 py-6 text-lg font-bold">
                                     Start Free Trial
                                     <ArrowRight className="w-5 h-5 ml-2" />
                                 </Button>
                             </Link>
                             <Link href="/auth/login">
-                                <Button size="lg" className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-teal-600 px-10 py-6 text-lg font-bold">
-                                    Sign In
+                                <Button size="lg" className="bg-blue-600 border-2 border-blue-700 text-white hover:bg-blue-700 px-10 py-6 text-lg font-bold">
+                                    Sign In to Dashboard
                                 </Button>
                             </Link>
                         </div>
