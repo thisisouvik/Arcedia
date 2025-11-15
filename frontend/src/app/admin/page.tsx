@@ -161,14 +161,31 @@ function AdminDashboardContent() {
                     <p className="text-gray-600 text-center mb-6">
                         Please connect your wallet to access the admin dashboard
                     </p>
-                    <ConnectButton
-                        client={client}
-                        chain={sepolia}
-                        appMetadata={{
-                            name: 'Acredia Admin',
-                            url: 'https://acredia.app',
-                        }}
-                    />
+                    <div className="flex justify-center">
+                        <ConnectButton
+                            client={client}
+                            chain={sepolia}
+                            appMetadata={{
+                                name: 'Acredia Admin',
+                                url: 'https://acredia.app',
+                            }}
+                            theme="dark"
+                            connectButton={{
+                                label: 'Connect Wallet',
+                                style: {
+                                    background: 'linear-gradient(to right, #0d9488, #0891b2)',
+                                    color: 'white',
+                                    fontWeight: '600',
+                                    padding: '12px 24px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    fontSize: '16px',
+                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                },
+                            }}
+                        />
+                    </div>
                 </Card>
             </div>
         );
@@ -201,14 +218,31 @@ function AdminDashboardContent() {
                         Please connect the wallet that deployed the contracts to access admin features.
                     </p>
                     <div className="space-y-2">
-                        <ConnectButton
-                            client={client}
-                            chain={sepolia}
-                            appMetadata={{
-                                name: 'Acredia Admin',
-                                url: 'https://acredia.app',
-                            }}
-                        />
+                        <div className="flex justify-center">
+                            <ConnectButton
+                                client={client}
+                                chain={sepolia}
+                                appMetadata={{
+                                    name: 'Acredia Admin',
+                                    url: 'https://acredia.app',
+                                }}
+                                theme="dark"
+                                connectButton={{
+                                    label: 'Connect Wallet',
+                                    style: {
+                                        background: 'linear-gradient(to right, #0d9488, #0891b2)',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        padding: '12px 24px',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        width: '100%',
+                                        fontSize: '16px',
+                                    },
+                                }}
+                            />
+                        </div>
                         <Button
                             onClick={() => router.push('/dashboard')}
                             variant="outline"
@@ -252,6 +286,20 @@ function AdminDashboardContent() {
                                 appMetadata={{
                                     name: 'Acredia Admin',
                                     url: 'https://acredia.app',
+                                }}
+                                theme="dark"
+                                connectButton={{
+                                    label: 'Connect Wallet',
+                                    style: {
+                                        background: 'linear-gradient(to right, #0d9488, #0891b2)',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                    },
                                 }}
                             />
                             <Button
