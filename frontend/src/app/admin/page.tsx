@@ -183,7 +183,7 @@ function AdminDashboardContent() {
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center space-x-3">
                             <Image
-                                src="/Acredia.png"
+                                src="/logo.png"
                                 alt="Acredia Logo"
                                 width={40}
                                 height={40}

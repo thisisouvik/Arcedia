@@ -87,12 +87,12 @@ function DashboardContent() {
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center space-x-3">
                             <Image
-                                src="/Acredia.png"
-                                alt="Acredia Logo"
-                                width={40}
-                                height={40}
-                                className="rounded-lg"
-                            />
+                                    src="/logo.png"
+                                    alt="Acredia Logo"
+                                    width={40}
+                                    height={40}
+                                    className="rounded-lg"
+                                />
                             <span className="text-2xl font-bold bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
                                 ACREDIA
                             </span>

@@ -75,13 +75,13 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3">
-              <Image
-                src="/Acredia.png"
-                alt="Acredia Logo"
-                width={40}
-                height={40}
-                className="rounded-lg"
-              />
+                <Image
+                  src="/logo.png"
+                  alt="Acredia Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-lg"
+                />
               <span className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
                 ACREDIA
               </span>
@@ -663,7 +663,7 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <Image
-                  src="/Acredia.png"
+                  src="/logo.png"
                   alt="Acredia Logo"
                   width={32}
                   height={32}
