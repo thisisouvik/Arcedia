@@ -872,20 +872,20 @@ Special thanks to the blockchain and open-source community for making this proje
     <td align="center">
       <img src="https://github.com/thisisouvik.png" width="100px;" alt="Souvik Mandal"/><br />
       <sub><b>Souvik Mandal</b></sub><br />
-      <a href="https://github.com/thisisouvik">GitHub</a>
+      Backend Developer
     </td>
     <td align="center">
-      <img src="https://via.placeholder.com/100" width="100px;" alt="Soumen Das"/><br />
+      <img src="https://github.com/soumen0818.png" width="100px;" alt="Soumen Das"/><br />
       <sub><b>Soumen Das</b></sub><br />
       Blockchain Developer
     </td>
     <td align="center">
-      <img src="https://via.placeholder.com/100" width="100px;" alt="Snigdha Mandal"/><br />
+      <img src="https://github.com/snigdhamandal.png" width="100px;" alt="Snigdha Mandal"/><br />
       <sub><b>Snigdha Mandal</b></sub><br />
       Frontend Developer
     </td>
     <td align="center">
-      <img src="https://via.placeholder.com/100" width="100px;" alt="Soumen Mandal"/><br />
+      <img src="https://github.com/soumen1080.png" width="100px;" alt="Soumen Mandal"/><br />
       <sub><b>Soumen Mandal</b></sub><br />
       Full Stack Developer
     </td>
