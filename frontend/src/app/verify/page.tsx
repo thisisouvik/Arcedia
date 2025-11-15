@@ -6,8 +6,9 @@ import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, AlertCircle, ExternalLink, Shield, Calendar, User, Building2, FileText, Hash } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, ExternalLink, Shield, Calendar, User, Building2, FileText, Hash, Home, Info, Award, Lock } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface CredentialData {
     id: string;
@@ -23,7 +24,7 @@ interface CredentialData {
     institution: {
         name: string;
         wallet_address: string;
-    };
+    } | null;
 }
 
 export default function VerifyPage() {
@@ -34,12 +35,12 @@ export default function VerifyPage() {
     const [credential, setCredential] = useState<CredentialData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [verificationStatus, setVerificationStatus] = useState<'valid' | 'invalid' | 'revoked' | null>(null);
+    const [manualToken, setManualToken] = useState('');
 
     useEffect(() => {
         if (tokenId) {
             verifyCredential(tokenId);
         } else {
-            setError('No token ID provided in URL');
             setLoading(false);
         }
     }, [tokenId]);
@@ -96,7 +97,14 @@ export default function VerifyPage() {
             } else if (!data) {
                 throw new Error('Credential not found');
             } else {
-                setCredential(data as CredentialData);
+                // Transform the data: institution comes as array from Supabase join
+                const transformedData: CredentialData = {
+                    ...data,
+                    institution: Array.isArray(data.institution) && data.institution.length > 0
+                        ? data.institution[0]
+                        : null
+                };
+                setCredential(transformedData);
             }
 
             // Check if revoked
@@ -144,284 +152,647 @@ export default function VerifyPage() {
         return `https://ipfs.io/ipfs/${hash}`;
     };
 
+    const handleManualVerify = () => {
+        if (manualToken.trim()) {
+            // Update URL with token
+            window.history.pushState({}, '', `/verify?token=${manualToken.trim()}`);
+            verifyCredential(manualToken.trim());
+        }
+    };
+
+    // Show manual entry form if no token provided
+    if (!tokenId && !loading && !credential) {
+        return (
+            <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-teal-50">
+                {/* Navbar */}
+                <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-between">
+                            <Link href="/" className="flex items-center space-x-3">
+                                <Image
+                                    src="/Acredia.png"
+                                    alt="Acredia Logo"
+                                    width={40}
+                                    height={40}
+                                    className="rounded-lg"
+                                />
+                                <div>
+                                    <span className="text-2xl font-bold bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                        ACREDIA
+                                    </span>
+                                    <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-semibold">
+                                        VERIFY
+                                    </span>
+                                </div>
+                            </Link>
+                            <div className="flex items-center space-x-4">
+                                <Link href="/">
+                                    <Button variant="ghost" size="sm">
+                                        <Home className="h-4 w-4 mr-2" />
+                                        Home
+                                    </Button>
+                                </Link>
+                                <Link href="/about">
+                                    <Button variant="ghost" size="sm">
+                                        <Info className="h-4 w-4 mr-2" />
+                                        About
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                {/* Hero Section */}
+                <div className="container mx-auto px-4 py-12">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Info Cards */}
+                        <div className="grid md:grid-cols-3 gap-4 mb-8">
+                            <Card className="p-4 bg-white/80 backdrop-blur border-blue-200">
+                                <div className="flex items-center space-x-3">
+                                    <div className="rounded-full bg-blue-100 p-3">
+                                        <Shield className="h-6 w-6 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900">Blockchain Secured</h3>
+                                        <p className="text-xs text-gray-600">Tamper-proof verification</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="p-4 bg-white/80 backdrop-blur border-teal-200">
+                                <div className="flex items-center space-x-3">
+                                    <div className="rounded-full bg-teal-100 p-3">
+                                        <Award className="h-6 w-6 text-teal-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900">Instant Verification</h3>
+                                        <p className="text-xs text-gray-600">Real-time credential check</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="p-4 bg-white/80 backdrop-blur border-purple-200">
+                                <div className="flex items-center space-x-3">
+                                    <div className="rounded-full bg-purple-100 p-3">
+                                        <Lock className="h-6 w-6 text-purple-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900">Privacy Protected</h3>
+                                        <p className="text-xs text-gray-600">Secure credential data</p>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* Main Verification Card */}
+                        <Card className="p-8 md:p-12 bg-white/90 backdrop-blur shadow-xl">
+                            <div className="flex flex-col items-center space-y-6">
+                                <div className="rounded-full bg-linear-to-br from-blue-100 to-teal-100 p-8">
+                                    <Shield className="h-20 w-20 text-blue-600" />
+                                </div>
+                                <div className="text-center space-y-3">
+                                    <h1 className="text-4xl font-bold text-gray-900">Verify Academic Credential</h1>
+                                    <p className="text-lg text-gray-600 max-w-2xl">
+                                        Enter a credential token ID to instantly verify its authenticity on the blockchain
+                                    </p>
+                                </div>
+
+                                <div className="w-full max-w-md space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Credential Token ID
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={manualToken}
+                                            onChange={(e) => setManualToken(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleManualVerify()}
+                                            placeholder="Enter token ID (e.g., 1, 2, 3...)"
+                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-2">
+                                            💡 The token ID can be found on the credential or in the QR code
+                                        </p>
+                                    </div>
+                                    <Button
+                                        onClick={handleManualVerify}
+                                        disabled={!manualToken.trim()}
+                                        className="w-full bg-linear-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white py-6 text-lg font-semibold"
+                                    >
+                                        <Shield className="h-5 w-5 mr-2" />
+                                        Verify Credential
+                                    </Button>
+                                </div>
+
+                                <div className="mt-8 text-center space-y-4">
+                                    <div className="flex items-center justify-center space-x-2">
+                                        <div className="h-px bg-gray-300 w-20"></div>
+                                        <p className="text-sm text-gray-500 font-medium">OR</p>
+                                        <div className="h-px bg-gray-300 w-20"></div>
+                                    </div>
+                                    <p className="text-sm text-gray-600">
+                                        📱 Scan a QR code to verify automatically
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* How It Works Section */}
+                        <div className="mt-12 grid md:grid-cols-3 gap-6">
+                            <Card className="p-6 bg-white/80 backdrop-blur text-center">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 font-bold text-xl mb-4">
+                                    1
+                                </div>
+                                <h3 className="font-bold text-gray-900 mb-2">Enter Token ID</h3>
+                                <p className="text-sm text-gray-600">
+                                    Input the credential token ID or scan the QR code
+                                </p>
+                            </Card>
+                            <Card className="p-6 bg-white/80 backdrop-blur text-center">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-100 text-teal-600 font-bold text-xl mb-4">
+                                    2
+                                </div>
+                                <h3 className="font-bold text-gray-900 mb-2">Blockchain Verification</h3>
+                                <p className="text-sm text-gray-600">
+                                    System checks the credential against blockchain records
+                                </p>
+                            </Card>
+                            <Card className="p-6 bg-white/80 backdrop-blur text-center">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600 font-bold text-xl mb-4">
+                                    3
+                                </div>
+                                <h3 className="font-bold text-gray-900 mb-2">View Results</h3>
+                                <p className="text-sm text-gray-600">
+                                    Instantly see verification status and credential details
+                                </p>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center p-4">
-                <Card className="w-full max-w-2xl p-8">
-                    <div className="flex flex-col items-center justify-center space-y-4">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        <p className="text-gray-600">Verifying credential...</p>
+            <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-teal-50">
+                {/* Navbar */}
+                <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-between">
+                            <Link href="/" className="flex items-center space-x-3">
+                                <Image
+                                    src="/Acredia.png"
+                                    alt="Acredia Logo"
+                                    width={40}
+                                    height={40}
+                                    className="rounded-lg"
+                                />
+                                <div>
+                                    <span className="text-2xl font-bold bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                        ACREDIA
+                                    </span>
+                                    <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-semibold">
+                                        VERIFY
+                                    </span>
+                                </div>
+                            </Link>
+                            <div className="flex items-center space-x-4">
+                                <Link href="/">
+                                    <Button variant="ghost" size="sm">
+                                        <Home className="h-4 w-4 mr-2" />
+                                        Home
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-                </Card>
+                </nav>
+
+                <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+                    <Card className="w-full max-w-2xl p-8">
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+                            <p className="text-lg font-semibold text-gray-700">Verifying credential...</p>
+                            <p className="text-sm text-gray-500">Checking blockchain records</p>
+                        </div>
+                    </Card>
+                </div>
             </div>
         );
     }
 
     if (error || !credential) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
-                <Card className="w-full max-w-2xl p-8">
-                    <div className="flex flex-col items-center justify-center space-y-6">
-                        <div className="rounded-full bg-red-100 p-6">
-                            <XCircle className="h-16 w-16 text-red-600" />
+            <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-orange-50">
+                {/* Navbar */}
+                <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-between">
+                            <Link href="/" className="flex items-center space-x-3">
+                                <Image
+                                    src="/Acredia.png"
+                                    alt="Acredia Logo"
+                                    width={40}
+                                    height={40}
+                                    className="rounded-lg"
+                                />
+                                <div>
+                                    <span className="text-2xl font-bold bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                        ACREDIA
+                                    </span>
+                                    <span className="ml-2 text-xs bg-red-600 text-white px-2 py-1 rounded-full font-semibold">
+                                        ERROR
+                                    </span>
+                                </div>
+                            </Link>
+                            <div className="flex items-center space-x-4">
+                                <Link href="/">
+                                    <Button variant="ghost" size="sm">
+                                        <Home className="h-4 w-4 mr-2" />
+                                        Home
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
-                        <div className="text-center space-y-2">
-                            <h1 className="text-2xl font-bold text-gray-900">Verification Failed</h1>
-                            <p className="text-gray-600">{error || 'Credential not found'}</p>
-                        </div>
-                        <Link href="/">
-                            <Button>
-                                Return to Home
-                            </Button>
-                        </Link>
                     </div>
-                </Card>
+                </nav>
+
+                <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+                    <Card className="w-full max-w-2xl p-8">
+                        <div className="flex flex-col items-center justify-center space-y-6">
+                            <div className="rounded-full bg-red-100 p-6">
+                                <XCircle className="h-20 w-20 text-red-600" />
+                            </div>
+                            <div className="text-center space-y-2">
+                                <h1 className="text-3xl font-bold text-gray-900">Verification Failed</h1>
+                                <p className="text-lg text-gray-600">{error || 'Credential not found'}</p>
+                                <p className="text-sm text-gray-500 mt-4">
+                                    The credential token ID may be invalid or the credential does not exist in our system.
+                                </p>
+                            </div>
+                            <div className="flex space-x-4">
+                                <Link href="/verify">
+                                    <Button className="bg-blue-600 hover:bg-blue-700">
+                                        Try Again
+                                    </Button>
+                                </Link>
+                                <Link href="/">
+                                    <Button variant="outline">
+                                        Return to Home
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-12 px-4">
-            <div className="max-w-4xl mx-auto space-y-6">
-                {/* Header */}
-                <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-900">Credential Verification</h1>
-                    <p className="text-gray-600">Blockchain-verified academic credential</p>
+        <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-teal-50">
+            {/* Navbar */}
+            <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+                <div className="container mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <Link href="/" className="flex items-center space-x-3">
+                            <Image
+                                src="/Acredia.png"
+                                alt="Acredia Logo"
+                                width={40}
+                                height={40}
+                                className="rounded-lg"
+                            />
+                            <div>
+                                <span className="text-2xl font-bold bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                    ACREDIA
+                                </span>
+                                <span className="ml-2 text-xs bg-green-600 text-white px-2 py-1 rounded-full font-semibold">
+                                    {verificationStatus === 'valid' ? 'VERIFIED' : verificationStatus === 'revoked' ? 'REVOKED' : 'VERIFY'}
+                                </span>
+                            </div>
+                        </Link>
+                        <div className="flex items-center space-x-4">
+                            <Link href="/verify">
+                                <Button variant="ghost" size="sm">
+                                    <Shield className="h-4 w-4 mr-2" />
+                                    New Verification
+                                </Button>
+                            </Link>
+                            <Link href="/">
+                                <Button variant="ghost" size="sm">
+                                    <Home className="h-4 w-4 mr-2" />
+                                    Home
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
+            </nav>
 
-                {/* Verification Status */}
-                <Card className="p-8">
-                    <div className="flex flex-col items-center justify-center space-y-4">
-                        {verificationStatus === 'valid' && (
-                            <>
-                                <div className="rounded-full bg-green-100 p-6">
-                                    <CheckCircle className="h-16 w-16 text-green-600" />
-                                </div>
-                                <div className="text-center space-y-2">
-                                    <h2 className="text-2xl font-bold text-gray-900">Credential Verified ✓</h2>
-                                    <p className="text-gray-600">This credential is authentic and valid</p>
-                                </div>
-                                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                                    <Shield className="h-3 w-3 mr-1" />
-                                    Blockchain Verified
-                                </Badge>
-                            </>
-                        )}
-
-                        {verificationStatus === 'revoked' && (
-                            <>
-                                <div className="rounded-full bg-orange-100 p-6">
-                                    <AlertCircle className="h-16 w-16 text-orange-600" />
-                                </div>
-                                <div className="text-center space-y-2">
-                                    <h2 className="text-2xl font-bold text-gray-900">Credential Revoked</h2>
-                                    <p className="text-gray-600">This credential has been revoked by the issuing institution</p>
-                                    {credential.revoked_at && (
-                                        <p className="text-sm text-gray-500">
-                                            Revoked on: {formatDate(credential.revoked_at)}
-                                        </p>
-                                    )}
-                                </div>
-                                <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
-                                    Revoked
-                                </Badge>
-                            </>
-                        )}
+            <div className="container mx-auto px-4 py-8 md:py-12">
+                <div className="max-w-5xl mx-auto space-y-6">
+                    {/* Header with Timestamp */}
+                    <div className="text-center space-y-3">
+                        <h1 className="text-4xl font-bold text-gray-900">Credential Verification Report</h1>
+                        <p className="text-gray-600">Blockchain-verified academic credential</p>
+                        <p className="text-sm text-gray-500">
+                            Verified on: {new Date().toLocaleString('en-US', {
+                                dateStyle: 'full',
+                                timeStyle: 'short'
+                            })}
+                        </p>
                     </div>
-                </Card>
 
-                {/* Credential Details */}
-                <Card className="p-8 space-y-6">
-                    <h3 className="text-xl font-bold text-gray-900 border-b pb-4">Credential Details</h3>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Student Information */}
-                        <div className="space-y-4">
-                            <div className="flex items-start space-x-3">
-                                <User className="h-5 w-5 text-blue-600 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500">Student Name</p>
-                                    <p className="text-base font-semibold text-gray-900">
-                                        {credential.metadata?.credentialData?.studentName || 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {credential.student_wallet_address && (
-                                <div className="flex items-start space-x-3">
-                                    <Hash className="h-5 w-5 text-blue-600 mt-0.5" />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Student Wallet</p>
-                                        <p className="text-xs font-mono text-gray-700 break-all">
-                                            {credential.student_wallet_address}
+                    {/* Verification Status */}
+                    <Card className="p-8 md:p-12 bg-white/90 backdrop-blur shadow-xl border-2">
+                        <div className="flex flex-col items-center justify-center space-y-6">
+                            {verificationStatus === 'valid' && (
+                                <>
+                                    <div className="rounded-full bg-linear-to-br from-green-100 to-emerald-100 p-8 shadow-lg">
+                                        <CheckCircle className="h-24 w-24 text-green-600" />
+                                    </div>
+                                    <div className="text-center space-y-3">
+                                        <h2 className="text-4xl font-bold text-gray-900">Credential Verified ✓</h2>
+                                        <p className="text-lg text-gray-600 max-w-2xl">
+                                            This credential is authentic, valid, and secured on the blockchain
                                         </p>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Institution Information */}
-                        <div className="space-y-4">
-                            <div className="flex items-start space-x-3">
-                                <Building2 className="h-5 w-5 text-teal-600 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500">Issuing Institution</p>
-                                    <p className="text-base font-semibold text-gray-900">
-                                        {credential.institution?.name || credential.metadata?.credentialData?.institutionName || 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {credential.issuer_wallet_address && (
-                                <div className="flex items-start space-x-3">
-                                    <Hash className="h-5 w-5 text-teal-600 mt-0.5" />
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Issuer Wallet</p>
-                                        <p className="text-xs font-mono text-gray-700 break-all">
-                                            {credential.issuer_wallet_address}
-                                        </p>
+                                    <div className="flex flex-wrap gap-3 justify-center">
+                                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-4 py-2 text-sm">
+                                            <Shield className="h-4 w-4 mr-2" />
+                                            Blockchain Verified
+                                        </Badge>
+                                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 px-4 py-2 text-sm">
+                                            <Lock className="h-4 w-4 mr-2" />
+                                            Tamper-Proof
+                                        </Badge>
+                                        <Badge className="bg-teal-100 text-teal-800 hover:bg-teal-100 px-4 py-2 text-sm">
+                                            <Award className="h-4 w-4 mr-2" />
+                                            Authentic
+                                        </Badge>
                                     </div>
-                                </div>
+                                </>
+                            )}
+
+                            {verificationStatus === 'revoked' && (
+                                <>
+                                    <div className="rounded-full bg-linear-to-br from-orange-100 to-red-100 p-8 shadow-lg">
+                                        <AlertCircle className="h-24 w-24 text-orange-600" />
+                                    </div>
+                                    <div className="text-center space-y-3">
+                                        <h2 className="text-4xl font-bold text-gray-900">Credential Revoked</h2>
+                                        <p className="text-lg text-gray-600 max-w-2xl">
+                                            This credential has been revoked by the issuing institution
+                                        </p>
+                                        {credential.revoked_at && (
+                                            <p className="text-sm text-gray-500 font-medium">
+                                                Revoked on: {formatDate(credential.revoked_at)}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 px-4 py-2 text-base">
+                                        ⚠️ Revoked
+                                    </Badge>
+                                </>
                             )}
                         </div>
+                    </Card>
 
-                        {/* Credential Type & Details */}
-                        <div className="space-y-4">
-                            <div className="flex items-start space-x-3">
-                                <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500">Credential Type</p>
-                                    <p className="text-base font-semibold text-gray-900">
-                                        {credential.metadata?.credentialData?.credentialType || 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
+                    {/* Credential Details */}
+                    <Card className="p-8 md:p-10 space-y-6 bg-white/90 backdrop-blur shadow-lg">
+                        <div className="flex items-center justify-between border-b pb-4">
+                            <h3 className="text-2xl font-bold text-gray-900">Credential Information</h3>
+                            <Badge variant="outline" className="text-sm">
+                                Token #{credential.token_id}
+                            </Badge>
+                        </div>
 
-                            {credential.metadata?.credentialData?.degree && (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* Student Information */}
+                            <div className="space-y-4">
                                 <div className="flex items-start space-x-3">
-                                    <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
+                                    <User className="h-5 w-5 text-blue-600 mt-0.5" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500">Degree</p>
+                                        <p className="text-sm font-medium text-gray-500">Student Name</p>
                                         <p className="text-base font-semibold text-gray-900">
-                                            {credential.metadata.credentialData.degree}
+                                            {credential.metadata?.credentialData?.studentName || 'N/A'}
                                         </p>
                                     </div>
                                 </div>
-                            )}
 
-                            {credential.metadata?.credentialData?.major && (
+                                {credential.student_wallet_address && (
+                                    <div className="flex items-start space-x-3">
+                                        <Hash className="h-5 w-5 text-blue-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">Student Wallet</p>
+                                            <p className="text-xs font-mono text-gray-700 break-all">
+                                                {credential.student_wallet_address}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Institution Information */}
+                            <div className="space-y-4">
+                                <div className="flex items-start space-x-3">
+                                    <Building2 className="h-5 w-5 text-teal-600 mt-0.5" />
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-500">Issuing Institution</p>
+                                        <p className="text-base font-semibold text-gray-900">
+                                            {credential.institution?.name || credential.metadata?.credentialData?.institutionName || 'N/A'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {credential.issuer_wallet_address && (
+                                    <div className="flex items-start space-x-3">
+                                        <Hash className="h-5 w-5 text-teal-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">Issuer Wallet</p>
+                                            <p className="text-xs font-mono text-gray-700 break-all">
+                                                {credential.issuer_wallet_address}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Credential Type & Details */}
+                            <div className="space-y-4">
                                 <div className="flex items-start space-x-3">
                                     <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500">Major</p>
-                                        <p className="text-base text-gray-900">
-                                            {credential.metadata.credentialData.major}
+                                        <p className="text-sm font-medium text-gray-500">Credential Type</p>
+                                        <p className="text-base font-semibold text-gray-900">
+                                            {credential.metadata?.credentialData?.credentialType || 'N/A'}
                                         </p>
                                     </div>
                                 </div>
-                            )}
 
-                            {credential.metadata?.credentialData?.gpa && (
+                                {credential.metadata?.credentialData?.degree && (
+                                    <div className="flex items-start space-x-3">
+                                        <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">Degree</p>
+                                            <p className="text-base font-semibold text-gray-900">
+                                                {credential.metadata.credentialData.degree}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {credential.metadata?.credentialData?.major && (
+                                    <div className="flex items-start space-x-3">
+                                        <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">Major</p>
+                                            <p className="text-base text-gray-900">
+                                                {credential.metadata.credentialData.major}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {credential.metadata?.credentialData?.gpa && (
+                                    <div className="flex items-start space-x-3">
+                                        <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">GPA</p>
+                                            <p className="text-base text-gray-900">
+                                                {credential.metadata.credentialData.gpa}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Issue Date */}
+                            <div className="space-y-4">
                                 <div className="flex items-start space-x-3">
-                                    <FileText className="h-5 w-5 text-purple-600 mt-0.5" />
+                                    <Calendar className="h-5 w-5 text-orange-600 mt-0.5" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500">GPA</p>
-                                        <p className="text-base text-gray-900">
-                                            {credential.metadata.credentialData.gpa}
+                                        <p className="text-sm font-medium text-gray-500">Issue Date</p>
+                                        <p className="text-base font-semibold text-gray-900">
+                                            {credential.metadata?.credentialData?.issueDate
+                                                ? formatDate(credential.metadata.credentialData.issueDate)
+                                                : formatDate(credential.issued_at)}
                                         </p>
                                     </div>
                                 </div>
-                            )}
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Blockchain Details */}
+                    <Card className="p-8 md:p-10 space-y-6 bg-white/90 backdrop-blur shadow-lg border-l-4 border-blue-500">
+                        <div className="flex items-center space-x-3 border-b pb-4">
+                            <div className="rounded-lg bg-blue-100 p-2">
+                                <Shield className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">Blockchain Verification</h3>
                         </div>
 
-                        {/* Issue Date */}
-                        <div className="space-y-4">
-                            <div className="flex items-start space-x-3">
-                                <Calendar className="h-5 w-5 text-orange-600 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500">Issue Date</p>
-                                    <p className="text-base font-semibold text-gray-900">
-                                        {credential.metadata?.credentialData?.issueDate
-                                            ? formatDate(credential.metadata.credentialData.issueDate)
-                                            : formatDate(credential.issued_at)}
+                        <div className="space-y-6">
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                                <p className="text-sm font-medium text-blue-900 mb-2">Token ID</p>
+                                <p className="text-lg font-mono font-bold text-blue-700">
+                                    #{credential.token_id}
+                                </p>
+                            </div>
+
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-semibold text-gray-700">Transaction Hash</p>
+                                    <Badge variant="outline" className="text-xs">
+                                        zkSync Sepolia
+                                    </Badge>
+                                </div>
+                                <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <p className="text-sm font-mono text-gray-900 break-all flex-1">
+                                        {credential.blockchain_hash}
                                     </p>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="shrink-0"
+                                        asChild
+                                    >
+                                        <a
+                                            href={`https://sepolia.explorer.zksync.io/tx/${credential.blockchain_hash}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <ExternalLink className="h-4 w-4 mr-1" />
+                                            View
+                                        </a>
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </Card>
 
-                {/* Blockchain Details */}
-                <Card className="p-8 space-y-4">
-                    <h3 className="text-xl font-bold text-gray-900 border-b pb-4">Blockchain Information</h3>
-
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Token ID</p>
-                            <p className="text-sm font-mono text-gray-900 break-all bg-gray-50 p-3 rounded">
-                                {credential.token_id}
-                            </p>
-                        </div>
-
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Transaction Hash</p>
-                            <div className="flex items-center space-x-2">
-                                <p className="text-sm font-mono text-gray-900 break-all bg-gray-50 p-3 rounded flex-1">
-                                    {credential.blockchain_hash}
-                                </p>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    asChild
-                                >
-                                    <a
-                                        href={`https://sepolia.explorer.zksync.io/tx/${credential.blockchain_hash}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-semibold text-gray-700">IPFS Content Hash</p>
+                                    <Badge variant="outline" className="text-xs">
+                                        Decentralized Storage
+                                    </Badge>
+                                </div>
+                                <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <p className="text-sm font-mono text-gray-900 break-all flex-1">
+                                        {credential.ipfs_hash}
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="shrink-0"
+                                        asChild
                                     >
-                                        <ExternalLink className="h-4 w-4" />
-                                    </a>
-                                </Button>
+                                        <a
+                                            href={getIPFSUrl(credential.ipfs_hash)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <ExternalLink className="h-4 w-4 mr-1" />
+                                            View
+                                        </a>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="bg-linear-to-r from-blue-50 to-teal-50 p-4 rounded-lg border border-blue-200">
+                                <p className="text-sm text-gray-700 flex items-start">
+                                    <Shield className="h-5 w-5 text-blue-600 mr-2 mt-0.5 shrink-0" />
+                                    <span>
+                                        <strong>Blockchain Security:</strong> This credential is permanently recorded on the zkSync Sepolia blockchain
+                                        and stored on IPFS, ensuring it cannot be altered, forged, or tampered with.
+                                    </span>
+                                </p>
                             </div>
                         </div>
+                    </Card>
 
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">IPFS Hash</p>
-                            <div className="flex items-center space-x-2">
-                                <p className="text-sm font-mono text-gray-900 break-all bg-gray-50 p-3 rounded flex-1">
-                                    {credential.ipfs_hash}
-                                </p>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    asChild
-                                >
-                                    <a
-                                        href={getIPFSUrl(credential.ipfs_hash)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <ExternalLink className="h-4 w-4" />
-                                    </a>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-
-                {/* Actions */}
-                <div className="flex justify-center space-x-4">
-                    <Link href="/">
-                        <Button variant="outline">
-                            Return to Home
+                    {/* Actions */}
+                    <div className="flex justify-center space-x-4 pb-8">
+                        <Link href="/verify">
+                            <Button className="bg-blue-600 hover:bg-blue-700">
+                                <Shield className="h-4 w-4 mr-2" />
+                                Verify Another
+                            </Button>
+                        </Link>
+                        <Link href="/">
+                            <Button variant="outline">
+                                <Home className="h-4 w-4 mr-2" />
+                                Return to Home
+                            </Button>
+                        </Link>
+                        <Button
+                            onClick={() => window.print()}
+                            variant="outline"
+                        >
+                            Print Report
                         </Button>
-                    </Link>
-                    <Button
-                        onClick={() => window.print()}
-                        variant="outline"
-                    >
-                        Print Verification
-                    </Button>
+                    </div>
                 </div>
             </div>
         </div>
