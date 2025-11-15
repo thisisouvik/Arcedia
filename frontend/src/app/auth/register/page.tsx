@@ -74,24 +74,26 @@ function RegisterForm() {
                     <button
                         type="button"
                         onClick={() => setRole('institution')}
-                        className={`p-4 rounded-lg border-2 transition-all ${role === 'institution'
+                        aria-pressed={role === 'institution'}
+                        className={`p-4 rounded-lg border-2 transition-all focus:outline-none focus:ring-2 focus:ring-blue-300 ${role === 'institution'
                             ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-slate-600 hover:border-slate-500'
+                            : 'border-slate-300 hover:border-slate-400 bg-white'
                             }`}
                     >
-                        <Building2 className="h-8 w-8 text-white mx-auto mb-2" />
-                        <p className="text-white font-medium">Institution</p>
+                        <Building2 className={`h-8 w-8 mx-auto mb-2 ${role === 'institution' ? 'text-blue-600' : 'text-slate-700'}`} />
+                        <p className={`${role === 'institution' ? 'text-blue-700 font-medium' : 'text-slate-700 font-medium'}`}>Institution</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('student')}
-                        className={`p-4 rounded-lg border-2 transition-all ${role === 'student'
+                        aria-pressed={role === 'student'}
+                        className={`p-4 rounded-lg border-2 transition-all focus:outline-none focus:ring-2 focus:ring-blue-300 ${role === 'student'
                             ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-slate-600 hover:border-slate-500'
+                            : 'border-slate-300 hover:border-slate-400 bg-white'
                             }`}
                     >
-                        <GraduationCap className="h-8 w-8 text-white mx-auto mb-2" />
-                        <p className="text-white font-medium">Student</p>
+                        <GraduationCap className={`h-8 w-8 mx-auto mb-2 ${role === 'student' ? 'text-blue-600' : 'text-slate-700'}`} />
+                        <p className={`${role === 'student' ? 'text-blue-700 font-medium' : 'text-slate-700 font-medium'}`}>Student</p>
                     </button>
                 </div>
 
