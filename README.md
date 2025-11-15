@@ -119,6 +119,11 @@ This architecture ensures credentials are:
 
 ---
 
+##  Complete system architecture showing the interaction between frontend, blockchain, storage, and database layers
+<div align="center">
+  <img src="https://res.cloudinary.com/dczuivjqz/image/upload/v1763205064/WhatsApp_Image_2025-11-15_at_16.40.43_4419a7b7_mknf8x.jpg" alt="Acredia System Architecture" width="800"/>
+</div>
+
 ## ⚡ Key Features
 
 ### For Students
