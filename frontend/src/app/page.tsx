@@ -391,78 +391,83 @@ export default function Home() {
         }
         .animate-gradient {
           background-size: 200% 200%;
-          animation: gradient 8s ease infinite;
+          animation: gradient 6s ease infinite;
+        }
+        /* Marquee animation for trust badges */
+        .trust-marquee {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          animation: marquee 16s linear infinite;
+          will-change: transform;
+        }
+        .trust-marquee:hover {
+          animation-play-state: paused;
+        }
+        @keyframes marquee {
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
       `}</style>
 
-      {/* Trust Badges */}
+      {/* Trust Badges - Animated Horizontal Marquee */}
       <section className="bg-white py-12 border-y border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <p className="text-sm text-gray-500 uppercase tracking-wide font-semibold">
               Trusted by Leading Universities Worldwide
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-6xl mx-auto">
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://tse3.mm.bing.net/th/id/OIP.7bACtsXUKPDhBOuidawTTwHaGr?pid=Api&P=0&h=180"
-                alt="MIT"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
-            </div>
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://www.scholarshipregion.com/wp-content/uploads/2022/09/University-of-Oxford-UK.jpg"
-                alt="Oxford University"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
-            </div>
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://tse1.mm.bing.net/th/id/OIP.xHMtPAL900IBFxWZBfM6gAHaEp?pid=Api&P=0&h=180"
-                alt="Stanford University"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
-            </div>
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://tse4.mm.bing.net/th/id/OIP.7YBhBgFBg-bpAgV5kpJ0AwHaEL?pid=Api&P=0&h=180"
-                alt="Harvard University"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
-            </div>
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://tse3.mm.bing.net/th/id/OIP.cJonBR8WAhleDoeIvPHtDQHaEK?pid=Api&P=0&h=180"
-                alt="Cambridge University"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
-            </div>
-            <div className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 p-4 flex items-center justify-center overflow-hidden border border-gray-100 hover:border-teal-200 hover:-translate-y-2 cursor-pointer">
-              <Image
-                src="https://tse3.mm.bing.net/th/id/OIP.6_BcDwnHtQHpmB0zsZW6JwHaDe?pid=Api&P=0&h=180"
-                alt="IIT"
-                width={160}
-                height={140}
-                className="object-contain w-full h-24 transition-transform duration-500 group-hover:scale-110"
-                unoptimized
-              />
+
+          <div className="overflow-hidden">
+            <div className="trust-marquee flex items-center gap-8 py-4">
+              {/* Repeat the logo set twice so the animation loops seamlessly */}
+              <div className="flex items-center gap-8">
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.7bACtsXUKPDhBOuidawTTwHaGr?pid=Api&P=0&h=180" alt="MIT" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://www.scholarshipregion.com/wp-content/uploads/2022/09/University-of-Oxford-UK.jpg" alt="Oxford" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse1.mm.bing.net/th/id/OIP.xHMtPAL900IBFxWZBfM6gAHaEp?pid=Api&P=0&h=180" alt="Stanford" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse4.mm.bing.net/th/id/OIP.7YBhBgFBg-bpAgV5kpJ0AwHaEL?pid=Api&P=0&h=180" alt="Harvard" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.cJonBR8WAhleDoeIvPHtDQHaEK?pid=Api&P=0&h=180" alt="Cambridge" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.6_BcDwnHtQHpmB0zsZW6JwHaDe?pid=Api&P=0&h=180" alt="IIT" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+              </div>
+
+              {/* duplicate */}
+              <div className="flex items-center gap-8">
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.7bACtsXUKPDhBOuidawTTwHaGr?pid=Api&P=0&h=180" alt="MIT" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://www.scholarshipregion.com/wp-content/uploads/2022/09/University-of-Oxford-UK.jpg" alt="Oxford" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse1.mm.bing.net/th/id/OIP.xHMtPAL900IBFxWZBfM6gAHaEp?pid=Api&P=0&h=180" alt="Stanford" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse4.mm.bing.net/th/id/OIP.7YBhBgFBg-bpAgV5kpJ0AwHaEL?pid=Api&P=0&h=180" alt="Harvard" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.cJonBR8WAhleDoeIvPHtDQHaEK?pid=Api&P=0&h=180" alt="Cambridge" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+                <div className="min-w-[200px] flex items-center justify-center">
+                  <Image src="https://tse3.mm.bing.net/th/id/OIP.6_BcDwnHtQHpmB0zsZW6JwHaDe?pid=Api&P=0&h=180" alt="IIT" width={160} height={140} className="object-contain h-20" unoptimized />
+                </div>
+              </div>
             </div>
           </div>
         </div>
