@@ -104,6 +104,29 @@ export default function VerifyPage() {
                         ? data.institution[0]
                         : null
                 };
+
+                // Fetch metadata from IPFS if ipfs_hash exists
+                if (transformedData.ipfs_hash) {
+                    try {
+                        console.log('📦 Fetching metadata from IPFS:', transformedData.ipfs_hash);
+                        const ipfsUrl = getIPFSUrl(transformedData.ipfs_hash);
+                        const metadataResponse = await fetch(ipfsUrl);
+
+                        if (metadataResponse.ok) {
+                            const ipfsMetadata = await metadataResponse.json();
+                            console.log('✅ IPFS Metadata fetched:', ipfsMetadata);
+
+                            // Merge IPFS metadata with database data (IPFS takes precedence)
+                            transformedData.metadata = ipfsMetadata;
+                        } else {
+                            console.warn('⚠️ Could not fetch IPFS metadata, using database metadata');
+                        }
+                    } catch (ipfsError) {
+                        console.error('❌ Error fetching IPFS metadata:', ipfsError);
+                        console.log('Using database metadata as fallback');
+                    }
+                }
+
                 setCredential(transformedData);
             }
 
@@ -685,6 +708,99 @@ export default function VerifyPage() {
                         </div>
                     </Card>
 
+                    {/* Subject-wise Marks */}
+                    {credential.metadata?.credentialData?.subjects && credential.metadata.credentialData.subjects.length > 0 && (
+                        <Card className="p-8 md:p-10 space-y-6 bg-white/90 backdrop-blur shadow-lg border-l-4 border-purple-500">
+                            <div className="flex items-center space-x-3 border-b pb-4">
+                                <div className="rounded-lg bg-purple-100 p-2">
+                                    <FileText className="h-6 w-6 text-purple-600" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900">Subject-wise Performance</h3>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b-2 border-gray-200">
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Subject</th>
+                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Marks Obtained</th>
+                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Max Marks</th>
+                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Percentage</th>
+                                            {credential.metadata.credentialData.subjects.some((s: any) => s.grade) && (
+                                                <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Grade</th>
+                                            )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {credential.metadata.credentialData.subjects.map((subject: any, index: number) => {
+                                            const percentage = subject.marks && subject.maxMarks
+                                                ? ((parseFloat(subject.marks) / parseFloat(subject.maxMarks)) * 100).toFixed(2)
+                                                : 'N/A';
+                                            return (
+                                                <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                                                    <td className="py-3 px-4 font-medium text-gray-900">{subject.name}</td>
+                                                    <td className="text-center py-3 px-4 text-gray-700">{subject.marks}</td>
+                                                    <td className="text-center py-3 px-4 text-gray-700">{subject.maxMarks}</td>
+                                                    <td className="text-center py-3 px-4">
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${parseFloat(percentage) >= 75 ? 'bg-green-100 text-green-800' :
+                                                            parseFloat(percentage) >= 60 ? 'bg-blue-100 text-blue-800' :
+                                                                parseFloat(percentage) >= 40 ? 'bg-yellow-100 text-yellow-800' :
+                                                                    'bg-red-100 text-red-800'
+                                                            }`}>
+                                                            {percentage}%
+                                                        </span>
+                                                    </td>
+                                                    {credential.metadata.credentialData.subjects.some((s: any) => s.grade) && (
+                                                        <td className="text-center py-3 px-4">
+                                                            <span className="inline-block px-3 py-1 rounded-full text-sm font-bold bg-purple-100 text-purple-800">
+                                                                {subject.grade || '-'}
+                                                            </span>
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Summary Stats */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                                <div className="bg-blue-50 p-4 rounded-lg text-center">
+                                    <p className="text-sm text-gray-600 mb-1">Total Subjects</p>
+                                    <p className="text-2xl font-bold text-blue-600">
+                                        {credential.metadata.credentialData.subjects.length}
+                                    </p>
+                                </div>
+                                <div className="bg-green-50 p-4 rounded-lg text-center">
+                                    <p className="text-sm text-gray-600 mb-1">Average Percentage</p>
+                                    <p className="text-2xl font-bold text-green-600">
+                                        {(() => {
+                                            const validSubjects = credential.metadata.credentialData.subjects.filter(
+                                                (s: any) => s.marks && s.maxMarks
+                                            );
+                                            if (validSubjects.length === 0) return 'N/A';
+                                            const total = validSubjects.reduce((acc: number, s: any) => {
+                                                return acc + (parseFloat(s.marks) / parseFloat(s.maxMarks)) * 100;
+                                            }, 0);
+                                            return (total / validSubjects.length).toFixed(2) + '%';
+                                        })()}
+                                    </p>
+                                </div>
+                                <div className="bg-purple-50 p-4 rounded-lg text-center">
+                                    <p className="text-sm text-gray-600 mb-1">Total Marks</p>
+                                    <p className="text-2xl font-bold text-purple-600">
+                                        {credential.metadata.credentialData.subjects.reduce((acc: number, s: any) =>
+                                            acc + (parseFloat(s.marks) || 0), 0
+                                        )} / {credential.metadata.credentialData.subjects.reduce((acc: number, s: any) =>
+                                            acc + (parseFloat(s.maxMarks) || 0), 0
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
                     {/* Blockchain Details */}
                     <Card className="p-8 md:p-10 space-y-6 bg-white/90 backdrop-blur shadow-lg border-l-4 border-blue-500">
                         <div className="flex items-center space-x-3 border-b pb-4">
@@ -720,7 +836,7 @@ export default function VerifyPage() {
                                         asChild
                                     >
                                         <a
-                                            href={`https://sepolia.explorer.zksync.io/tx/${credential.blockchain_hash}`}
+                                            href={`https://sepolia.etherscan.io/tx/${credential.blockchain_hash}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >

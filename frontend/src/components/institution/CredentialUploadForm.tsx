@@ -6,10 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { Upload, FileText, Loader2, CheckCircle2, Plus, X } from 'lucide-react';
 import { issueCredential, type CredentialData } from '@/lib/credentialService';
 import { isValidAddress } from '@/lib/contracts';
 import { toast } from 'sonner';
+
+interface Subject {
+    id: string;
+    name: string;
+    marks: string;
+    maxMarks: string;
+    grade?: string;
+}
 
 interface CredentialUploadFormProps {
     institutionId: string;
@@ -29,6 +37,7 @@ export function CredentialUploadForm({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
 
     const [formData, setFormData] = useState({
         studentName: '',
@@ -40,6 +49,34 @@ export function CredentialUploadForm({
         gpa: '',
         issueDate: new Date().toISOString().split('T')[0],
     });
+
+    const addSubject = () => {
+        const newSubject: Subject = {
+            id: Date.now().toString(),
+            name: '',
+            marks: '',
+            maxMarks: '100',
+            grade: '',
+        };
+        setSubjects([...subjects, newSubject]);
+    };
+
+    const removeSubject = (id: string) => {
+        setSubjects(subjects.filter(subject => subject.id !== id));
+    };
+
+    const updateSubject = (id: string, field: keyof Subject, value: string) => {
+        setSubjects(subjects.map(subject =>
+            subject.id === id ? { ...subject, [field]: value } : subject
+        ));
+    };
+
+    const calculatePercentage = (marks: string, maxMarks: string) => {
+        const m = parseFloat(marks);
+        const max = parseFloat(maxMarks);
+        if (isNaN(m) || isNaN(max) || max === 0) return '';
+        return ((m / max) * 100).toFixed(2) + '%';
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -119,6 +156,7 @@ export function CredentialUploadForm({
                 institutionName,
                 institutionWallet,
                 file: selectedFile,
+                subjects: subjects.length > 0 ? subjects : undefined,
             };
 
             toast.loading('Issuing credential...', { id: 'issue-credential' });
@@ -144,6 +182,7 @@ export function CredentialUploadForm({
             });
             setSelectedFile(null);
             setPreviewUrl(null);
+            setSubjects([]);
 
             // Call success callback
             if (onSuccess) {
@@ -280,6 +319,111 @@ export function CredentialUploadForm({
                     </div>
                 </div>
 
+                {/* Subject-wise Marks (Optional) */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900">Subject-wise Marks (Optional)</h3>
+                        <Button
+                            type="button"
+                            onClick={addSubject}
+                            variant="outline"
+                            size="sm"
+                            className="text-teal-600 border-teal-600 hover:bg-teal-50"
+                        >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add Subject
+                        </Button>
+                    </div>
+
+                    {subjects.length > 0 && (
+                        <div className="space-y-3">
+                            {subjects.map((subject, index) => (
+                                <Card key={subject.id} className="p-4 bg-gray-50">
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
+                                            <div>
+                                                <Label className="text-xs">Subject Name</Label>
+                                                <Input
+                                                    placeholder="Mathematics"
+                                                    value={subject.name}
+                                                    onChange={(e) => updateSubject(subject.id, 'name', e.target.value)}
+                                                    className="h-9"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-xs">Marks Obtained</Label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="85"
+                                                    value={subject.marks}
+                                                    onChange={(e) => updateSubject(subject.id, 'marks', e.target.value)}
+                                                    className="h-9"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-xs">Max Marks</Label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="100"
+                                                    value={subject.maxMarks}
+                                                    onChange={(e) => updateSubject(subject.id, 'maxMarks', e.target.value)}
+                                                    className="h-9"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-xs">Grade (Optional)</Label>
+                                                <Input
+                                                    placeholder="A"
+                                                    value={subject.grade}
+                                                    onChange={(e) => updateSubject(subject.id, 'grade', e.target.value)}
+                                                    className="h-9"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-2 pt-5">
+                                            <Button
+                                                type="button"
+                                                onClick={() => removeSubject(subject.id)}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                            {subject.marks && subject.maxMarks && (
+                                                <span className="text-xs font-medium text-teal-600">
+                                                    {calculatePercentage(subject.marks, subject.maxMarks)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p className="text-xs text-blue-800">
+                                    💡 <strong>Total Subjects:</strong> {subjects.length} |
+                                    <strong className="ml-2">Average:</strong> {subjects.length > 0 && subjects.every(s => s.marks && s.maxMarks)
+                                        ? (() => {
+                                            const total = subjects.reduce((acc, s) => {
+                                                const percentage = (parseFloat(s.marks) / parseFloat(s.maxMarks)) * 100;
+                                                return acc + percentage;
+                                            }, 0);
+                                            return (total / subjects.length).toFixed(2) + '%';
+                                        })()
+                                        : 'N/A'
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {subjects.length === 0 && (
+                        <div className="text-center py-4 border border-dashed border-gray-300 rounded-lg">
+                            <p className="text-sm text-gray-500">No subjects added yet. Click "Add Subject" to include subject-wise marks.</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* File Upload */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">Credential Document</h3>
@@ -348,7 +492,7 @@ export function CredentialUploadForm({
                     <Button
                         type="submit"
                         disabled={isSubmitting || !selectedFile}
-                        className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white"
+                        className="w-full bg-linear-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white"
                     >
                         {isSubmitting ? (
                             <>
