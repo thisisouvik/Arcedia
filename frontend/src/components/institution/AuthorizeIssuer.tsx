@@ -148,6 +148,23 @@ export function AuthorizeIssuer() {
             toast.success('Wallet authorized successfully!', { id: 'authorize' });
             toast.success(`Transaction: ${result.transactionHash.slice(0, 10)}...`);
 
+            // Update database to reflect authorization
+            try {
+                const response = await fetch('/api/admin/update-authorization', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress: walletToAuthorize }),
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('✅ Database updated:', data.message);
+                }
+            } catch (dbError) {
+                console.warn('Failed to update database:', dbError);
+                // Don't show error to user as blockchain authorization succeeded
+            }
+
             // Check status after authorization
             await checkAuthorization(walletToAuthorize);
         } catch (error: any) {

@@ -30,6 +30,14 @@ const CREDENTIAL_NFT_ABI = [
     },
 ] as const;
 
+interface AdminStats {
+    totalInstitutions: number;
+    authorizedInstitutions: number;
+    totalCredentials: number;
+    activeCredentials: number;
+    totalStudents: number;
+}
+
 function AdminDashboardContent() {
     const { user, signOut } = useAuth();
     const router = useRouter();
@@ -37,6 +45,14 @@ function AdminDashboardContent() {
     const [contractOwner, setContractOwner] = useState<string>('');
     const [isOwner, setIsOwner] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
+    const [stats, setStats] = useState<AdminStats>({
+        totalInstitutions: 0,
+        authorizedInstitutions: 0,
+        totalCredentials: 0,
+        activeCredentials: 0,
+        totalStudents: 0,
+    });
+    const [loadingStats, setLoadingStats] = useState(true);
 
     const contract = getContract({
         client,
@@ -83,6 +99,37 @@ function AdminDashboardContent() {
 
         checkOwnership();
     }, [account, router]);
+
+    // Fetch admin statistics
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoadingStats(true);
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    setStats(data.stats);
+                    console.log('📊 Admin stats loaded:', data.stats);
+                } else {
+                    console.error('Failed to fetch stats:', data.error);
+                    toast.error('Failed to load statistics');
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                toast.error('Failed to load statistics');
+            } finally {
+                setLoadingStats(false);
+            }
+        };
+
+        if (isOwner) {
+            fetchStats();
+            // Refresh stats every 30 seconds
+            const interval = setInterval(fetchStats, 30000);
+            return () => clearInterval(interval);
+        }
+    }, [isOwner]);
 
     const handleSignOut = async () => {
         await signOut();
@@ -183,7 +230,7 @@ function AdminDashboardContent() {
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center space-x-3">
                             <Image
-                                src="/Acredia.png"
+                                src="/logo.png"
                                 alt="Acredia Logo"
                                 width={40}
                                 height={40}
@@ -273,8 +320,18 @@ function AdminDashboardContent() {
                                 Total Institutions
                             </h3>
                         </div>
-                        <p className="text-3xl font-bold text-teal-600">-</p>
-                        <p className="text-sm text-gray-500 mt-1">Registered institutions</p>
+                        {loadingStats ? (
+                            <div className="animate-pulse">
+                                <div className="h-10 bg-gray-200 rounded w-16 mb-2"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <p className="text-3xl font-bold text-teal-600">
+                                    {stats.totalInstitutions}
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">Registered institutions</p>
+                            </>
+                        )}
                     </Card>
 
                     <Card className="p-6 bg-white border-gray-200 shadow-lg">
@@ -284,8 +341,18 @@ function AdminDashboardContent() {
                                 Authorized
                             </h3>
                         </div>
-                        <p className="text-3xl font-bold text-green-600">-</p>
-                        <p className="text-sm text-gray-500 mt-1">Authorized to issue</p>
+                        {loadingStats ? (
+                            <div className="animate-pulse">
+                                <div className="h-10 bg-gray-200 rounded w-16 mb-2"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <p className="text-3xl font-bold text-green-600">
+                                    {stats.authorizedInstitutions}
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">Authorized to issue</p>
+                            </>
+                        )}
                     </Card>
 
                     <Card className="p-6 bg-white border-gray-200 shadow-lg">
@@ -295,8 +362,20 @@ function AdminDashboardContent() {
                                 Total Credentials
                             </h3>
                         </div>
-                        <p className="text-3xl font-bold text-blue-600">-</p>
-                        <p className="text-sm text-gray-500 mt-1">Issued credentials</p>
+                        {loadingStats ? (
+                            <div className="animate-pulse">
+                                <div className="h-10 bg-gray-200 rounded w-16 mb-2"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <p className="text-3xl font-bold text-blue-600">
+                                    {stats.totalCredentials}
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    {stats.activeCredentials} active, {stats.totalCredentials - stats.activeCredentials} revoked
+                                </p>
+                            </>
+                        )}
                     </Card>
                 </div>
 

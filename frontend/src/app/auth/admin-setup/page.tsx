@@ -95,7 +95,7 @@ export default function AdminSetupPage() {
                     <div className="flex justify-center">
                         <div className="relative">
                             <Image
-                                src="/Acredia.png"
+                                src="/logo.png"
                                 alt="Acredia Logo"
                                 width={80}
                                 height={80}

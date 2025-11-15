@@ -45,7 +45,7 @@ export default function LoginPage() {
             <Card className="w-full max-w-md border-gray-200 bg-white shadow-2xl p-8">
                 <div className="flex flex-col items-center mb-8">
                     <Image
-                        src="/Acredia.png"
+                        src="/logo.png"
                         alt="Acredia Logo"
                         width={80}
                         height={80}
